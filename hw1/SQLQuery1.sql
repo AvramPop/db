@@ -22,8 +22,6 @@ publisher_name varchar(20) not null,
 publisher_location varchar(30) not null)
 
 
-
-
 create table Book(
 book_id int primary key identity,
 name varchar(50) not null,
@@ -57,25 +55,10 @@ conference_id int primary key identity,
 conference_name varchar(50) not null,
 speaker int foreign key references Theologian(theologian_id)
 )
+
 create table Interest(
 theologian_id int foreign key references Theologian(theologian_id),
 topic_id int foreign key references Topic(topic_id),
 constraint interest_id Primary key(theologian_id, topic_id)
 )
---create table Doctor(
---Did int primary key identity,
---Name varchar(50) not null,
---Specialisation varchar(100) not null
---)
---create table Medical_Record(
---Pid int foreign key references Pacient(Pid),
---Did int foreign key references Doctor(Did),
---Disease varchar(70),
---Solved bit, 
---constraint pk_Medical_Record PRIMARY KEY(Pid, Did)
---)
---create table Pay_bill(
---Payid int foreign key references Pacient(Pid),
---Amount float,
---constraint pk_Pay_bill primary key(Payid)
---)
+
