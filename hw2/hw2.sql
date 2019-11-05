@@ -1,4 +1,5 @@
 --- inserts
+insert into Denomination(denomination_name, headquartes) values ('Church of God', 'Cleveland')
 insert into Denomination(denomination_name, headquartes) values ('Lutheran', 'Missouri')
 insert into Denomination(denomination_name, headquartes) values ('Southern Baptist', 'Texas')
 
@@ -50,11 +51,11 @@ ALTER COLUMN gender char;
 
  insert into Interest(theologian_id, topic_id) values (1, 2)
  insert into Interest(theologian_id, topic_id) values (2, 3)
- insert into Interest(theologian_id, topic_id) values (7, 2)
+ insert into Interest(theologian_id, topic_id) values (3, 2)
 
  insert into Publishing_contract(author_id, book_id) values (1, 1)
  insert into Publishing_contract(author_id, book_id) values (2, 3)
- insert into Publishing_contract(author_id, book_id) values (7, 3)
+ insert into Publishing_contract(author_id, book_id) values (1, 3)
  insert into Publishing_contract(author_id, book_id) values (2, 2)
  insert into Publishing_contract(author_id, book_id) values (3, 2) --- violates a referential integrity constraints
 
@@ -159,32 +160,63 @@ Theologian on Theologian.theologian_id = Publishing_contract.author_id where The
 (select Institution.institution_id from Institution inner join Theologian on Theologian.alma_mater_id = Institution.institution_id
 where Institution.institution_name = 'Wheaton College'))
 
---- i. 4 queries using ANY and ALL to introduce a subquery in the WHERE clause; 
---- 2 of them should be rewritten with aggregation operators, while the other 2 should also be expressed with [NOT] IN.
+select Theologian.name
+from Theologian
+where Theologian.year_of_birth < all
+(select Theologian.year_of_birth from Theologian inner join Institution 
+on Theologian.alma_mater_id = Institution.institution_id where Institution.institution_name = 'Fuller Seminary')
+---rewritten with not in
+select T.name
+from Theologian T
+where T.year_of_birth not in
+(select T.year_of_birth from Theologian inner join Institution 
+on T.alma_mater_id = Institution.institution_id where (Institution.institution_name = 'Fuller Seminary'
+and T.year_of_birth > (select min(Theologian.year_of_birth) from Theologian inner join Institution 
+on Theologian.alma_mater_id = Institution.institution_id and Institution.institution_name = 'Fuller Seminary')))
 
 select Theologian.name 
 from Theologian
-where Theologian.alma_mater_id < any(
+where Theologian.year_of_birth > any(
 select Institution.institution_id from Institution where Institution.institution_location = 'California')
+---rewrite with in
+select T.name
+from Theologian T
+where T.year_of_birth not in
+(select T.year_of_birth from Theologian inner join Institution 
+on T.alma_mater_id = Institution.institution_id where (Institution.institution_location = 'California'
+and T.year_of_birth < (select min(Theologian.year_of_birth) from Theologian inner join Institution 
+on Theologian.alma_mater_id = Institution.institution_id and Institution.institution_location = 'California')))
 
-select Publisher.publisher_name 
-from Publisher
-where Publisher.publisher_id > any(
-select Book.publisher_id from Book where Book.year_published > 2009)
-
-select Publisher.publisher_name 
-from Publisher
-where Publisher.publisher_id = all(
-select Book.publisher_id from Book where Book.book_id in (select Book.book_id 
+select Book.name 
+from Book
+where Book.year_published < all(
+select Book.year_published from Book where Book.book_id in (select Book.book_id 
+from Book inner join Publishing_contract 
+on Publishing_contract.book_id = Book.book_id inner join 
+Theologian on Theologian.theologian_id = Publishing_contract.author_id where Theologian.year_of_birth > 1950))
+--- rewritten using min
+select Book.name 
+from Book
+where Book.year_published < (
+select min(Book.year_published) from Book where Book.book_id in (select Book.book_id 
 from Book inner join Publishing_contract 
 on Publishing_contract.book_id = Book.book_id inner join 
 Theologian on Theologian.theologian_id = Publishing_contract.author_id where Theologian.year_of_birth > 1950))
 
 
-select Publisher.publisher_location 
-from Publisher
-where Publisher.publisher_id = all(
-select Book.publisher_id from Book where Book.book_id in (select Book.book_id 
+select Book.name 
+from Book
+where Book.year_published < any(
+select Book.year_published from Book where Book.book_id in (select Book.book_id 
+from Book inner join Publishing_contract 
+on Publishing_contract.book_id = Book.book_id inner join 
+Theologian on Theologian.theologian_id = Publishing_contract.author_id where Theologian.alma_mater_id in 
+(select Institution.institution_id from Institution where Institution.institution_name = 'Fuller Seminary')))
+--- rewritten using max
+select Book.name 
+from Book
+where Book.year_published < (select max(Book.year_published) from Book where Book.book_id in 
+(select Book.book_id 
 from Book inner join Publishing_contract 
 on Publishing_contract.book_id = Book.book_id inner join 
 Theologian on Theologian.theologian_id = Publishing_contract.author_id where Theologian.alma_mater_id in 

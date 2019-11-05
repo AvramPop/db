@@ -1,6 +1,6 @@
-create database Theologians_database
+create database Theologians
 GO
-use Theologians_database
+use Theologians
 GO
 create table Topic(
 topic_id INT PRIMARY KEY identity,
