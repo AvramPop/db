@@ -1,4 +1,4 @@
---insert data – for at least 4 tables; at least one statement should violate referential integrity constraints;
+--insert data – for at least 4 tables; at least one statement should violate referential integrity constraints; 144
 insert into Denomination(denomination_name, headquartes) values ('Church of God', 'Cleveland')
 insert into Denomination(denomination_name, headquartes) values ('Lutheran', 'Missouri')
 insert into Denomination(denomination_name, headquartes) values ('Southern Baptist', 'Texas')
@@ -57,7 +57,7 @@ ALTER COLUMN gender char;
  insert into Publishing_contract(author_id, book_id) values (2, 3)
  insert into Publishing_contract(author_id, book_id) values (1, 3)
  insert into Publishing_contract(author_id, book_id) values (2, 2)
- insert into Publishing_contract(author_id, book_id) values (3, 2) --- violates a referential integrity constraints
+ insert into Publishing_contract(author_id, book_id) values (88, 2) --- violates a referential integrity constraints
  --update data – for at least 3 tables;
 update Conference set speaker = 1 where conference_id = 1
 update Book set name = 'Arminian Theology. Abdridged edition' where book_id = 1
