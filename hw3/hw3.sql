@@ -15,7 +15,6 @@ as
 		alter column monthly_income int
 		print 'Undo Procedure P1: monthly_income in Theologian is back to int'
 go
-drop procedure U1
 exec U1
 
 -- b. add / remove a column;
@@ -191,5 +190,4 @@ as
 	end
 go
 select * from Version
-drop procedure main
-exec main 0
+exec main 2
