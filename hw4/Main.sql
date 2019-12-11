@@ -1,14 +1,15 @@
 create procedure MainTestAux @entries int, @t3 datetime output as
 begin
-	insert into TestTables(TestID, TableID, NoOfRows, Position) values (1, 1, 3, 1)
+	insert into TestTables(TestID, TableID, NoOfRows, Position) values (1, 1, @entries, 1)
 	insert into TestTables(TestID, TableID, NoOfRows, Position) values (2, 2, @entries, 1)
 	insert into TestTables(TestID, TableID, NoOfRows, Position) values (3, 3, @entries, 1)
-	execute Insert1 
-	execute Insert2 
-	execute Insert3 
 	execute Delete3 
 	execute Delete2
 	execute Delete1
+	execute Insert1 
+	execute Insert2 
+	execute Insert3 
+
 	execute RunView1
 	execute RunView2
 	execute RunView3
@@ -18,7 +19,6 @@ begin
 	delete from TestTables where TestId = 2
 	delete from TestTables where TestId = 3
 end
-
 drop procedure MainTestAux
 go
 
@@ -35,7 +35,7 @@ go
 
 drop procedure TestF
 select * from TestRuns
-execute MainTest @values = 100
+execute MainTest @values = 5
 
 select * from Tests
 go
@@ -46,12 +46,14 @@ begin
 	declare @insertQuery varchar(50), @deleteQuery varchar(50)
 	set @insertQuery = 'execute Insert' + convert(varchar(3), @table)
 	set @deleteQuery = 'execute Delete' + convert(varchar(3), @table)
-	exec (@insertQuery)
 	exec (@deleteQuery)
+	exec (@insertQuery)
+	
 	set @t2 = getdate()
 
 	delete from TestTables where TestId = 1
 end
+
 go
 create procedure RunTest @values int, @tableIn int as
 begin
@@ -62,8 +64,9 @@ begin
 	insert into TestRunTables(TestRunID, TableID, StartAt, EndAt) values (@tableIn, @tableIn, @t1, @t2out)
 end
 go
-execute RunTest @values = 300, @tableIn = 2
+execute RunTest @values = 3, @tableIn = 2
 select * from TestRunTables
+delete from TestRunTables
 
 go
 create procedure ViewTestAux @table int, @t2 datetime output as
@@ -90,4 +93,4 @@ end
 go
 delete from TestRunViews
 select * from TestRunViews
-execute ViewTest @tableIn = 3
+execute ViewTest @tableIn = 2

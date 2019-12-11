@@ -144,12 +144,13 @@ go
 execute Delete3
 go
 
-execute Insert1
-execute Insert2
-execute Insert3
 execute Delete3
 execute Delete2
 execute Delete1
+execute Insert1
+execute Insert2
+execute Insert3
+
 
 select * from Denomination
 select * from Book
