@@ -33,9 +33,9 @@ begin
 end
 go
 
-drop procedure TestF
+--drop procedure TestF
 select * from TestRuns
-execute MainTest @values = 5
+execute MainTest @values = 50
 
 select * from Tests
 go
@@ -64,7 +64,7 @@ begin
 	insert into TestRunTables(TestRunID, TableID, StartAt, EndAt) values (@tableIn, @tableIn, @t1, @t2out)
 end
 go
-execute RunTest @values = 3, @tableIn = 2
+execute RunTest @values = 30, @tableIn = 2
 select * from TestRunTables
 delete from TestRunTables
 
